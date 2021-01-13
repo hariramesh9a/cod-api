@@ -56,7 +56,7 @@ def predict(amount=100, user=1):
     for x in range(1, 4):
         output["label"].append((datetime.today() + timedelta(days=x)).strftime('%Y%m%d'))
         if hbase_flag:
-            model = hbaseapi.get_models(user)
+            model = torch.load(hbaseapi.get_models(user))
             model.eval()
         else:
             model = torch.load(dir + "/mdl" + str(x))
