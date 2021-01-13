@@ -5,8 +5,11 @@ import numpy as np
 import torch.utils.data as data_utils
 from sklearn.preprocessing import MinMaxScaler
 import pickle
+import hbaseapi
 
 from datetime import datetime, timedelta
+
+hbase_flag = False
 
 
 class LSTM(nn.Module):
@@ -52,8 +55,12 @@ def predict(amount=100, user=1):
 
     for x in range(1, 4):
         output["label"].append((datetime.today() + timedelta(days=x)).strftime('%Y%m%d'))
-        model = torch.load(dir + "/mdl" + str(x))
-        model.eval()
+        if hbase_flag:
+            model = hbaseapi.get_models(user)
+            model.eval()
+        else:
+            model = torch.load(dir + "/mdl" + str(x))
+            model.eval()
         with torch.no_grad():
             model.hidden = (torch.zeros(1, 1, model.hidden_layer_size),
                             torch.zeros(1, 1, model.hidden_layer_size))
