@@ -2,8 +2,10 @@ from flask import Flask
 from flask import Response, request
 from predict import predict, LSTM
 import json
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
@@ -17,4 +19,4 @@ def hello():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="0.0.0.0", port=5000)
