@@ -5,6 +5,8 @@ import numpy as np
 import torch.utils.data as data_utils
 from sklearn.preprocessing import MinMaxScaler
 import pickle
+import json
+from hbaseapi import save_dict
 
 file_path = "/Users/harumughan/Downloads/bench_work/Hackathon_cod/User-1-data.csv"
 sdf = pd.read_csv(file_path, header=None, usecols=[1, 2, 3, 4, 5, 6, 7],
@@ -28,14 +30,15 @@ def standardizeData(X, SS=None, train=False):
         return (new_X, None)
 
 
-dir='models/user1/'
-target = pd.DataFrame(sdf['day3'])
+dir = 'models/user1/'
 
-print(sdf[:1])
+mdl = '1'
+target = pd.DataFrame(sdf['day' + mdl])
 
-del sdf['day3']
+
+del sdf['day' + mdl]
 df, sc = standardizeData(sdf, None, True)
-filename = dir+'scalar.sav'
+filename = dir + 'scalar.sav'
 
 print(df)
 tgt, sp = standardizeData(target, None, True)
@@ -84,7 +87,9 @@ def train():
             print(f'epoch: {i:3} loss: {single_loss.item():10.8f}')
 
     model.eval()
-    torch.save(model, "models/user1/mdl3")
+    print(model.state_dict())
+    save_dict("user1~model" + mdl, str(model.state_dict()))
+    torch.save(model, "models/user1/mdl" + mdl)
 
 
 def predict():
@@ -101,8 +106,7 @@ def predict():
         model.hidden = (torch.zeros(1, 1, model.hidden_layer_size),
                         torch.zeros(1, 1, model.hidden_layer_size))
         print(model(seq).item())
-        print(sp.inverse_transform(np.array(model(seq).item()).reshape(-1,1))[0][0])
-
+        print(sp.inverse_transform(np.array(model(seq).item()).reshape(-1, 1))[0][0])
 
 
 train()
